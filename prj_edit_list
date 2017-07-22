@@ -1,0 +1,6 @@
+#!/bin/bash
+
+BASE="$bleung"/C++/LIBRARY2
+
+gedit input_params_rng  copper.cpp output.cpp init.cpp copper.h  mult_sim process_multi.R input_params script.R Makefile prj_edit_list 
+
