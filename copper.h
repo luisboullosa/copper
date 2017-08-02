@@ -6,14 +6,13 @@ enum op_info{tot_n=1,cells,m_fit_d,v_fit_d,m_fit_di,v_fit_di,end_op_info};
 
 #include<vbc_FileManagement.h>
 #include<vbc_vector.h>
-#include<statistics.h>
+//#include<statistics.h>
 #include <gsl_rng.h>
 #include <gsl_randist.h>
 #include<iostream>
 #include<gsl_cdf.h>
 using namespace std;
 using namespace vbc_lib;
-
 
 
 //**density dependent (but not kicking in at K) - gaussian and other distributions
@@ -42,40 +41,42 @@ extern int rng_begin;
 extern _vbc_vec<double> p,rng_p;
 extern _vbc_vec<int> sp_exist;
 extern _vbc_vec<int> count_migr;
-extern _vbc_vec<int> c_migr_reg;//migration between regions
+extern _vbc_vec<int> c_migr_reg; //migration between regions
 extern int n_reg;
+
 //**********************************PARAMETERS
 enum params
 {
 n_rep=1,
-end_t,//duration
-l_size1,//size of landscape
-step,//determining the size of each patch
-spc_aut_cor,//the magnitude of spatial autocorrelation
-env_range,//this is relevant relative to the mutation rates. - this
+end_t,			//duration
+l_size1,		//size of landscape
+step,			//determining the size of each patch
+spc_aut_cor,	//the magnitude of spatial autocorrelation
+env_range,		//this is relevant relative to the mutation rates. - this
 disturbance,
-spc_evolve,//environmental range shifts
+spc_evolve,		//environmental range shifts
 num_species,
-migr_evolve,//migration rules: 0 - migrate based on fixed rate, 1 - migrate evolves and prob depends on fitness, 2 - migrate rate evolves but not based on fitness
-m_evol_sd,//rate of migration evolution, if it occurs
-force_event,//number of time intervals before environment reshifts
-n_burn,//burn in to reach equalibrium genotypes, within local conditions. Modelled with "large" population
-K,//carrying capacity
+migr_evolve,	//migration rules: 0 - migrate based on fixed rate, 1 - migrate evolves and prob depends on fitness, 2 - migrate rate evolves but not based on fitness
+m_evol_sd,		//rate of migration evolution, if it occurs
+force_event,	//number of time intervals before environment reshifts
+n_burn,			//burn in to reach equalibrium genotypes, within local conditions. Modelled with "large" population
+K,				//carrying capacity
 migrate_rate,
-p_ld_disp,//proability long distance dispersal: separate 3 levels - migrate, high prob and low prob: separation also allows meta-pop dynamics etc.
-burn_diff,//allows burn in environment to differ from competition environment (i.e., introduced to novel habitat)
-env_dim,//the number of environmental dimensions to determine fitness
-tr_per_env,//number of traits per environmental condition
-env_ch_sd,//normal distribution for environmental change - also relative to mutation rates/magnitude. May also want to have rare massive effects periodically.
+p_ld_disp,		//proability long distance dispersal: separate 3 levels - migrate, high prob and low prob: separation also allows meta-pop dynamics etc.
+burn_diff,		//allows burn in environment to differ from competition environment (i.e., introduced to novel habitat)
+env_dim,		//the number of environmental dimensions to determine fitness
+tr_per_env,		//number of traits per environmental condition //GENES??
+env_ch_sd,		//normal distribution for environmental change - also relative to mutation rates/magnitude. May also want to have rare massive effects periodically.
 mut_rate,
 fecundity,
-fit_d_sd,//relative fitness
-fit_di_sd,//realized carrying capacity (doesn't depend on who is there)
-fit_dist_sd,//frequency dependent interactions
+fit_d_sd,		//relative fitness
+fit_di_sd,		//realized carrying capacity (doesn't depend on who is there)
+fit_dist_sd,	//frequency dependent interactions
 sd_fit_transport,
-mort_bg,//background mortality (stochastic)
+mort_bg, 		//background mortality (stochastic)
+gene_weights, 	//the epistatic weight of each gene on the other traits (0.0 - 1.0)
 params_end
-};//rng_end allows it to be flexible so that don't have to count the number of parameters used
+};				//rng_end allows it to be flexible so that don't have to count the number of parameters used
 
 //********************MAIN STRUCTURES
 

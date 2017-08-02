@@ -1,5 +1,6 @@
-#include"copper.h"
+#include "copper.h"
 gsl_rng *_r;
+using namespace vbc_lib;
 
 //Lot P2, arrival port 3 for shuttle??
 
@@ -9,7 +10,7 @@ gsl_rng *_r;
 
 bool plot_grid=true;
 bool print_burn=false;
-bool sens_analysis=true;
+bool sens_analysis=false;
 int thin=100;
 int st;
 string headerfile="copper.h";
@@ -27,7 +28,7 @@ bool (*chk_break)()=0;//def_chk_break;
 void (*set_env_spc)()=&def_set_env_spc;
 int n_max;
 _vbc_vec<landscape> l, mem_l;
-_vbc_vec<double> p,rng_p;
+_vbc_vec<double> p, rng_p;
 _vbc_vec<int> sp_exist;
 _vbc_vec<int> count_migr;
 _vbc_vec<int> c_migr_reg;
@@ -44,23 +45,26 @@ string nm;
 string control_path;
 _vbc_vec<double> ops;	
 
+
 int main(int argc, char *argv[])
-{  	cout.precision(3);
+{  	
+	cout.precision(3);
 	cout<<"HELLO"<<endl;
 	_r = gsl_rng_alloc(gsl_rng_mt19937);
 	gsl_rng_set(_r,time(0));
 	nm=argv[1];
 	if(sens_analysis==false)
 	{
+		cout << "No sensitivity analysis" << endl;
 		string hd="head -10 "+headerfile+" | grep 'enum op_info' | sed 's/enum op_info{/''/g' | sed 's/=1/''/g' |sed 's/,end_op_info};//g' > op_head_"+nm;
 		system(hd.c_str());
 		input_opts();	
 		string tmp_s="cp input_params params_"+nm;
 		system(tmp_s.c_str());
 		//put the iterations here
-		for(rep=1; rep<=p(n_rep);rep++)
+		for(rep=1; rep <= p(n_rep); rep++)
 		{
-			cout<<"SS"<<endl;
+			cout<<"Simulation Start"<<endl;
 			if(ini()==false)//failed to have population at burn in
 				continue;
 				
@@ -70,7 +74,7 @@ int main(int argc, char *argv[])
 			op_head();	
 			simulate();
 			double mem_ld=p(p_ld_disp);
-			//turn of dispersal - i.e., all locations are now not connected
+			//turn off dispersal - i.e., all locations are now not connected
 			p(p_ld_disp)=0;
 			l=mem_l;
 			simulate();
@@ -108,6 +112,7 @@ int main(int argc, char *argv[])
 				j++;
 				p(i)=rng_p(rep,j);
 			}
+			
 			//saved a file that contained the parameter values associated with each rep, could do additional analysis after that
 			if(ini()==true)//failed to have population at burn in
 			{
@@ -116,7 +121,7 @@ int main(int argc, char *argv[])
 				simulate();
 
 				double mem_ld=p(p_ld_disp);
-				//turn of dispersal - i.e., all locations are now not connected
+				//turn on dispersal - i.e., all locations are now not connected
 				p(p_ld_disp)=0;
 				l=mem_l;
 				simulate();
@@ -162,7 +167,7 @@ void input_opts_rng()
 	{
 		f_input(&(p(i)));
 	}
-	l_size=p(l_size1);//because it is used so much
+	l_size=p(l_size1); //because it is used so much
 	rng_p.redim(1,p(n_rep),1,params_end-rng_begin);
 
 
@@ -191,14 +196,17 @@ void input_opts_rng()
 
 void input_opts()
 {
-	_vf.Open("input_params",ios_base::in,1);	
+	_vf.Open("input_params",ios_base::in, 1);	
 	p.redim(1,params_end-1);
+
+
 	//input all the single values first
 	for(int i=1;i<params_end;i++)
 	{
 		f_input(&(p(i)));
 	}
-	cout<<"NUM S "<<p(num_species)<<endl;;
+
+	cout<<"NUM SPP "<<p(num_species)<<endl;;
 	l_size=p(l_size1);//because it is used so much
 	_vf.Close(1);
 }
@@ -592,7 +600,7 @@ void individual::ini(_vbc_vec<double>* env, int g, int sp)
 	else
 		gender=int(2*RND(_r));
 	species=sp;
-	//this is an open question how want to initialize things
+	//this is an open question how to initialize things
 	for(int i=1;i<=p(env_dim);i++)
 	{
 		double tot=0,tot1=0;//now everything will be around the optimal range
@@ -607,6 +615,7 @@ void individual::ini(_vbc_vec<double>* env, int g, int sp)
 }
 void individual::assort(individual* i1, individual* i2)
 {
+	//ATTENTION, LUIS
 	int p1=int(2*RND(_r)+1);
 	int p2=int(2*RND(_r)+1);
 	c_migr(1)=i1->c_migr(p1);	
@@ -647,19 +656,53 @@ void individual::mutate()
 		}
 	}
 }
+
 void individual::calc_env_val()
 {
-	for(int i=1;i<=p(env_dim);i++)
+	if(p(gene_weights) == 0.0) 			// No epistasis
 	{
-		env_values(i)=0;
-		for(int k=1;k<=2;k++)
-		{	
-			for(int j=1;j<=p(tr_per_env);j++)
-			{
-				env_values(i)+=values(k,i,j);
+		for(int i = 1; i <= p(env_dim); i++)
+		{
+			env_values(i) = 0;
+
+			for(int k = 1; k <= 2; k++)
+			{	
+				for(int j=1; j <= p(tr_per_env); j++)
+				{
+					env_values(i) += values(k,i,j);
+				}
 			}
+			env_values(i) /= (2 * p(tr_per_env));
+			// Why are two parents always considered?
 		}
-		env_values(i)/=(2*p(tr_per_env));
+	}
+	else 											// In case of epigenesis
+	{
+		for(int i = 1; i <= p(env_dim); i++)		// for every trait
+		{
+			double totalWeight = 0.0;
+			env_values(i) = 0;
+			for(int l = 1; l <= p(env_dim); l++)	// for every trait-related gene
+			{
+				for(int k = 1; k <= 2; k++)			// for every parent
+				{	
+					for(int j=1; j <= p(tr_per_env); j++)
+					{
+						if(l == i) // Diagonal of the genotype-phenotype matrix
+						{
+							env_values(i) += values(k,i,j);
+							totalWeight += 1.0;
+						}
+						else		// 
+						{
+							env_values(i) += values(k,i,j) * p(gene_weights);
+							totalWeight += p(gene_weights);
+						}
+					}
+				}
+			}
+			env_values(i) /= (2 * p(tr_per_env) * totalWeight);
+		}
 	}
 }
 

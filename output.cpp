@@ -84,7 +84,7 @@ void def_print()
 		cout<<"Species "<<j;
 		for(int i=1;i<end_op_info;i++)
 		{
-			cout<<" "<<ops(j,i);
+			cout<<"\t "<<ops(j,i);
 		}
 		cout<<endl;
 	}
@@ -124,7 +124,7 @@ void def_output()
 					_vf.Write(1,l(i,j).n_sp(k))<<l(i,j).avg_phen(1,k)<<l(i,j).avg_phen(2,k);
 				}
 				_vf.Write(1,_Cr);
-//			cout<<i<<" "<<j<<" "<<l(i,j).env(1)<<" "<<l(i,j).env(2)<<endl;
+//			cout<<i<<"\t"<<j<<"\t"<<l(i,j).env(1)<<"\t"<<l(i,j).env(2)<<endl;
 			}
 		}
 		_vf.Close(1);

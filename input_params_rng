@@ -1,4 +1,4 @@
-n_rep,100
+n_rep,1
 end_t,2000
 l_size,9
 step,3
@@ -25,4 +25,5 @@ fit_di_sd,1000,1000
 fit_dist_sd,1000,1000
 sd_fit_transport,10,30
 mort_bg,0,0
+gene_weights,0.0,0.2
 rng_end

@@ -6,8 +6,9 @@
 #include<fstream>
 #include<vector>
 #include<vbc_genlib.h>
+#include<vbc_vector.h>
 //#include<vbc_stringfuncs.h>
-//#include<randomize.h>
+#include<randomize.h>
 #include<sstream>
 
 using namespace std;

@@ -75,7 +75,7 @@ void def_connect_cells() //SEPARATES INTO l_size/st*lsize/st locations
 
 void def_fill_landscape()
 {
-	//will remove bariers after, so simply allow distribution to evolve naturally if burn=false
+	//will remove barriers after, so simply allow distribution to evolve naturally if burn=false
 	//make individuals species identical except for the environmental preferences?
 	if(burn==true)
 	{
@@ -102,7 +102,7 @@ void def_fill_landscape()
 
 void fill_landscape_all_patch()
 {
-	//will remove bariers after, so simply allow distribution to evolve naturally if burn=false
+	//will remove barriers after, so simply allow distribution to evolve naturally if burn=false
 	//make individuals species identical except for the environmental preferences?
 	if(burn==true)
 	{
@@ -130,7 +130,7 @@ void fill_landscape_all_patch()
 
 void fill_landscape_all_patch2()
 {
-	//will remove bariers after, so simply allow distribution to evolve naturally if burn=false
+	//will remove barriers after, so simply allow distribution to evolve naturally if burn=false
 	//make individuals species identical except for the environmental preferences?
 	if(burn==true)
 	{

@@ -1,0 +1,49 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "linux": {
+        "command": "bash",
+        "args": ["-c"],
+        "isShellCommand": true,
+        "options": {
+            "cwd": "${workspaceRoot}",
+            "LDFLAGS": "-lgsl -lgslcblas",
+            "EXECUTABLE": "ex_copper",
+            "ARCH": "-mfpmath=sse",
+            "CFLAGS": "-I${workspaceRoot}/LIBRARY2 -I/usr/include/gsl -w -g $ARCH",
+            "SOURCES": "copper.cpp output.cpp init.cpp ${workspaceRoot}/LIBRARY2/vbc_FileManagement.cpp ${workspaceRoot}/LIBRARY2/vbc_stringfuncs.cpp"
+        },
+        "tasks": [
+            {
+                "taskName": "copper",
+                "suppressTaskName": true,
+                "echoCommand": true,
+                "isBuildCommand": true,
+                "args": [
+                "make all"
+                ]
+            },
+            {
+                "taskName": "clean",
+                "args": [
+                "make clean"
+                ]
+            },
+            {
+                "taskName": "compile w/o makefile",
+                "args": [
+                    "g++ $(CFLAGS) $(SOURCES) -o $(EXECUTABLE) $(LDFLAGS)"
+                ]
+            },
+            {
+                "taskName": "run test",
+                "isTestCommand": true,
+                "args": [
+                    "./ex_copper 4 10"
+                ]
+            }
+        ]
+    }
+    
+}
